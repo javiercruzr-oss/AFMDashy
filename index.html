@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,6 +15,68 @@
     padding: 24px;
   }
   .container { max-width: 900px; margin: 0 auto; }
+
+  #login-screen {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    background: #0d140d;
+    border: 1px solid #1a2e1a;
+    border-radius: 16px;
+    padding: 40px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+  }
+  .login-logo {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg, #2d6a2d, #4caf50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 16px;
+  }
+  .login-title { font-size: 18px; font-weight: bold; color: #a8d5a8; margin-bottom: 4px; }
+  .login-subtitle { font-size: 12px; color: #5a8a5a; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 24px; }
+  #password-input {
+    width: 100%;
+    background: #111b11;
+    border: 1px solid #1a2e1a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #c8e8c8;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  #password-input::placeholder { color: #3a5a3a; }
+  #password-input:focus { border-color: #2d6a2d; }
+  #login-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #2d6a2d, #4caf50);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #login-btn:hover { opacity: 0.9; }
+  #login-error {
+    color: #e08a8a;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  #login-error.visible { display: block; }
+
+  #dashboard { display: none; }
+  #dashboard.visible { display: block; }
+
   header {
     display: flex;
     align-items: center;
@@ -31,6 +94,7 @@
   }
   .brand-title { font-size: 18px; font-weight: bold; color: #a8d5a8; }
   .brand-subtitle { font-size: 12px; color: #5a8a5a; letter-spacing: 0.1em; text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
   .status {
     display: flex; align-items: center; gap: 8px;
     background: #0d2a0d; color: #7ab87a;
@@ -40,6 +104,16 @@
     width: 8px; height: 8px; border-radius: 50%; background: #4caf50;
   }
   .status-dot.offline { background: #cc4444; }
+  #logout-btn {
+    background: none;
+    border: 1px solid #1a2e1a;
+    color: #5a8a5a;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  #logout-btn:hover { color: #a8d5a8; border-color: #2d6a2d; }
 
   .kpi-grid {
     display: grid;
@@ -162,24 +236,6 @@
   }
   .info-card-text { font-size: 13px; color: #5a8a5a; line-height: 1.5; }
 
-  .config-banner {
-    background: #2a1a0d;
-    border: 1px solid #5a3a1a;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: #e0b04a;
-    display: none;
-  }
-  .config-banner.visible { display: block; }
-  .config-banner code {
-    background: #1a1208;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 12px;
-  }
-
   @media (max-width: 720px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .info-grid { grid-template-columns: 1fr; }
@@ -188,6 +244,19 @@
 </style>
 </head>
 <body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🌿</div>
+    <div class="login-title">Aguas Frescas de Mexico LLC</div>
+    <div class="login-subtitle">Virtual Chief of Staff</div>
+    <input type="password" id="password-input" placeholder="Contraseña de acceso" />
+    <button id="login-btn">Entrar</button>
+    <div id="login-error">Contraseña incorrecta. Intenta de nuevo.</div>
+  </div>
+</div>
+
+<div id="dashboard">
 <div class="container">
 
   <header>
@@ -198,15 +267,14 @@
         <div class="brand-subtitle">Virtual Chief of Staff</div>
       </div>
     </div>
-    <div class="status" id="status-badge">
-      <div class="status-dot" id="status-dot"></div>
-      <span id="status-text">Sistema listo</span>
+    <div class="header-right">
+      <div class="status" id="status-badge">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Sistema listo</span>
+      </div>
+      <button id="logout-btn">Cerrar sesión</button>
     </div>
   </header>
-
-  <div class="config-banner" id="config-banner">
-    ⚠️ Configura tu webhook de n8n: edita la línea <code>WEBHOOK_URL</code> en el archivo HTML con tu URL de producción.
-  </div>
 
   <div class="kpi-grid">
     <div class="kpi-card">
@@ -269,12 +337,52 @@
   </div>
 
 </div>
+</div>
 
 <script>
   // ============================================
-  // CONFIGURA TU WEBHOOK DE N8N AQUÍ:
+  // CONFIGURACIÓN — EDITA ESTOS VALORES
   const WEBHOOK_URL = 'https://javcru.app.n8n.cloud/webhook/cos-assistant';
+  const API_KEY = 'afm-cos-2026-xK9mP2vL';        // debe coincidir con el Header Auth en n8n
+  const API_KEY_HEADER_NAME = 'X-API-Key';         // nombre del header configurado en n8n
+  const SITE_PASSWORD = 'aguasfrescas2026';        // contraseña para entrar al dashboard
   // ============================================
+
+  const SESSION_KEY = 'afm_cos_authenticated';
+
+  const loginScreen = document.getElementById('login-screen');
+  const dashboard = document.getElementById('dashboard');
+  const passwordInput = document.getElementById('password-input');
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+  const logoutBtn = document.getElementById('logout-btn');
+
+  function showDashboard() {
+    loginScreen.style.display = 'none';
+    dashboard.classList.add('visible');
+  }
+
+  function tryLogin() {
+    if (passwordInput.value === SITE_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
+      showDashboard();
+    } else {
+      loginError.classList.add('visible');
+      passwordInput.value = '';
+    }
+  }
+
+  loginBtn.addEventListener('click', tryLogin);
+  passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') tryLogin(); });
+
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  });
+
+  if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+    showDashboard();
+  }
 
   const chatLog = document.getElementById('chat-log');
   const chatInput = document.getElementById('chat-input');
@@ -303,7 +411,10 @@
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          [API_KEY_HEADER_NAME]: API_KEY
+        },
         body: JSON.stringify({ question })
       });
 
@@ -313,7 +424,7 @@
       loadingMsg.textContent = text;
       statusText.textContent = 'Sistema listo';
     } catch (err) {
-      loadingMsg.textContent = 'No pude conectar con el sistema. Verifica que el workflow de n8n esté activo y que la URL del webhook sea correcta.\n\nError: ' + err.message;
+      loadingMsg.textContent = 'No pude conectar con el sistema. Verifica que el workflow de n8n esté activo, que la URL del webhook y la API key sean correctas.\n\nError: ' + err.message;
       statusDot.classList.add('offline');
       statusText.textContent = 'Sin conexión';
     } finally {
