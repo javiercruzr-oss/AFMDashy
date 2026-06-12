@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aguas Frescas de Mexico — Chief of Staff</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    background: #0a0f0a;
+    color: #e8f5e8;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #1a2e1a;
+    margin-bottom: 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #2d6a2d, #4caf50);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .brand-title { font-size: 18px; font-weight: bold; color: #a8d5a8; }
+  .brand-subtitle { font-size: 12px; color: #5a8a5a; letter-spacing: 0.1em; text-transform: uppercase; }
+  .status {
+    display: flex; align-items: center; gap: 8px;
+    background: #0d2a0d; color: #7ab87a;
+    padding: 6px 14px; border-radius: 20px; font-size: 13px;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #4caf50;
+  }
+  .status-dot.offline { background: #cc4444; }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: #0d140d;
+    border: 1px solid #1a2e1a;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .kpi-label { font-size: 12px; color: #5a8a5a; margin-bottom: 6px; }
+  .kpi-value { font-size: 24px; font-weight: bold; }
+  .kpi-value.positive { color: #6dd66d; }
+  .kpi-value.warning { color: #e0b04a; }
+  .kpi-sub { font-size: 11px; color: #4a7a4a; margin-top: 4px; }
+
+  .chat-card {
+    background: #0d140d;
+    border: 1px solid #1a2e1a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .chat-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .chat-icon {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #1a3a1a; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .chat-title { font-size: 15px; font-weight: bold; color: #c8e8c8; }
+
+  #chat-log {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 14px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .msg {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 85%;
+    white-space: pre-wrap;
+  }
+  .msg.user {
+    background: #1a3a1a;
+    color: #c8e8c8;
+    align-self: flex-end;
+    border-radius: 14px 4px 14px 14px;
+  }
+  .msg.assistant {
+    background: #111b11;
+    color: #c8e8c8;
+    align-self: flex-start;
+    border: 1px solid #1a2e1a;
+    border-radius: 4px 14px 14px 14px;
+  }
+
+  .input-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  #chat-input {
+    flex: 1;
+    background: #111b11;
+    border: 1px solid #1a2e1a;
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #c8e8c8;
+    font-size: 14px;
+    outline: none;
+  }
+  #chat-input::placeholder { color: #3a5a3a; }
+  #chat-input:focus { border-color: #2d6a2d; }
+  #chat-send {
+    padding: 12px 24px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #2d6a2d, #4caf50);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  #chat-send:disabled { background: #1a2e1a; color: #3a5a3a; cursor: not-allowed; }
+  #chat-send:hover:not(:disabled) { opacity: 0.9; }
+
+  .quick-questions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .quick-q {
+    background: #111b11;
+    border: 1px solid #1a2e1a;
+    color: #7ab87a;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quick-q:hover { background: #1a2e1a; color: #a8d5a8; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .info-card {
+    background: #0d140d;
+    border: 1px solid #1a2e1a;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .info-card-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: bold; color: #c8e8c8;
+    margin-bottom: 8px;
+  }
+  .info-card-text { font-size: 13px; color: #5a8a5a; line-height: 1.5; }
+
+  .config-banner {
+    background: #2a1a0d;
+    border: 1px solid #5a3a1a;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #e0b04a;
+    display: none;
+  }
+  .config-banner.visible { display: block; }
+  .config-banner code {
+    background: #1a1208;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  @media (max-width: 720px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .info-grid { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="brand">
+      <div class="logo">🌿</div>
+      <div>
+        <div class="brand-title">Aguas Frescas de Mexico LLC</div>
+        <div class="brand-subtitle">Virtual Chief of Staff</div>
+      </div>
+    </div>
+    <div class="status" id="status-badge">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Sistema listo</span>
+    </div>
+  </header>
+
+  <div class="config-banner" id="config-banner">
+    ⚠️ Configura tu webhook de n8n: edita la línea <code>WEBHOOK_URL</code> en el archivo HTML con tu URL de producción.
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">AR pendiente</div>
+      <div class="kpi-value">$54,200</div>
+      <div class="kpi-sub">28 facturas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">AP por pagar</div>
+      <div class="kpi-value">$18,940</div>
+      <div class="kpi-sub">12 cuentas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Cash flow neto</div>
+      <div class="kpi-value positive">+$12,300</div>
+      <div class="kpi-sub">últimos 30 días</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Clientes en riesgo</div>
+      <div class="kpi-value warning">15</div>
+      <div class="kpi-sub">requieren atención</div>
+    </div>
+  </div>
+
+  <div class="chat-card">
+    <div class="chat-header">
+      <div class="chat-icon">💬</div>
+      <div class="chat-title">Pregúntale a tu Chief of Staff</div>
+    </div>
+
+    <div id="chat-log"></div>
+
+    <div class="input-row">
+      <input type="text" id="chat-input" placeholder="¿Cómo está el cash flow esta semana?" />
+      <button id="chat-send">Enviar</button>
+    </div>
+
+    <div class="quick-questions">
+      <button class="quick-q" data-q="¿Cuál es mi cash flow status esta semana?">Cash flow status</button>
+      <button class="quick-q" data-q="¿Quiénes son mis clientes en riesgo y cuánto me deben?">Clientes en riesgo</button>
+      <button class="quick-q" data-q="¿Tengo reuniones importantes esta semana?">Agenda de la semana</button>
+      <button class="quick-q" data-q="¿Hay algún email urgente que deba revisar?">Emails urgentes</button>
+      <button class="quick-q" data-q="¿Cuál es el estado de AR y AP?">Estado AR / AP</button>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-title">📦 Producción</div>
+      <div class="info-card-text">Próximo plan: jueves 8am. Horchata es el producto líder con mayor demanda proyectada.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">📧 Briefing diario</div>
+      <div class="info-card-text">Se envía cada mañana a tu Outlook con urgentes, AR/AP y métricas clave.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">👥 Retención de clientes</div>
+      <div class="info-card-text">Reporte segmentado: Fresca Palapa, Sysco, externos. Próximo envío: viernes.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============================================
+  // CONFIGURA TU WEBHOOK DE N8N AQUÍ:
+  const WEBHOOK_URL = 'https://javcru.app.n8n.cloud/webhook/cos-assistant';
+  // ============================================
+
+  const chatLog = document.getElementById('chat-log');
+  const chatInput = document.getElementById('chat-input');
+  const chatSend = document.getElementById('chat-send');
+  const statusDot = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+
+  function addMessage(text, role) {
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + role;
+    msg.textContent = text;
+    chatLog.appendChild(msg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    return msg;
+  }
+
+  async function sendQuestion(question) {
+    if (!question.trim()) return;
+    addMessage(question, 'user');
+    chatInput.value = '';
+    const loadingMsg = addMessage('Consultando QuickBooks, correo y calendario...', 'assistant');
+    chatSend.disabled = true;
+    statusDot.classList.remove('offline');
+    statusText.textContent = 'Consultando...';
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+
+      const text = await response.text();
+      loadingMsg.textContent = text;
+      statusText.textContent = 'Sistema listo';
+    } catch (err) {
+      loadingMsg.textContent = 'No pude conectar con el sistema. Verifica que el workflow de n8n esté activo y que la URL del webhook sea correcta.\n\nError: ' + err.message;
+      statusDot.classList.add('offline');
+      statusText.textContent = 'Sin conexión';
+    } finally {
+      chatSend.disabled = false;
+    }
+  }
+
+  chatSend.addEventListener('click', () => sendQuestion(chatInput.value));
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendQuestion(chatInput.value); });
+  document.querySelectorAll('.quick-q').forEach(btn => {
+    btn.addEventListener('click', () => sendQuestion(btn.dataset.q));
+  });
+</script>
+</body>
+</html>
